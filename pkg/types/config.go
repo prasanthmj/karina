@@ -24,7 +24,6 @@ type PlatformConfig struct {
 	// The wildcard domain that cluster will be available at
 	Domain        string         `yaml:"domain" json:"domain,omitempty"`
 	ECK           ECK            `yaml:"eck,omitempty" json:"eck,omitempty"`
-	Elasticsearch *Elasticsearch `yaml:"elasticsearch,omitempty" json:"elasticsearch,omitempty"`
 	EventRouter   EventRouter    `yaml:"eventrouter,omitempty" json:"eventrouter,omitempty"`
 	ExternalDNS   ExternalDNS    `yaml:"externalDns,omitempty" json:"externalDns,omitempty"`
 	Filebeat      []Filebeat     `yaml:"filebeat,omitempty" json:"filebeat,omitempty"`
