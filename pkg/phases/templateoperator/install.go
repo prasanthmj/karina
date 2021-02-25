@@ -21,6 +21,7 @@ func Install(p *platform.Platform) error {
 	}
 
 	return p.ApplySpecs(Namespace, "template-operator.yaml")
+
 }
 
 func installNamespaceConfigurator(platform *platform.Platform) error {
