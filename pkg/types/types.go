@@ -995,7 +995,7 @@ func (p *PlatformConfig) String() string {
 
 // +kubebuilder:object:generate=false
 type Values struct {
-	inner map[string]interface{}
+	inner map[string]interface{} `json:"-"`
 }
 
 func (v *Values) Value() map[string]interface{} {
