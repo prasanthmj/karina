@@ -14,20 +14,20 @@ import (
 	yaml "gopkg.in/flanksource/yaml.v3"
 )
 
-type Enabled struct {
+type XEnabled struct {
 	// +optional
 	Disabled bool `yaml:"disabled" json:"disabled"`
 }
 
-type Disabled struct {
+type XDisabled struct {
 	// +optional
-	Disabled bool `yaml:"disabled" json:"disabled"`
+	Disabled string `yaml:"disabled" json:"disabled"`
 	// +optional
 	Version string `yaml:"version" json:"version"`
 }
 
-func (d Disabled) IsDisabled() bool {
-	if d.Disabled {
+func (d XDisabled) IsDisabled() bool {
+	if d.Disabled == "true" {
 		return true
 	}
 	return d.Version == ""
@@ -117,7 +117,7 @@ type MonitorPort struct {
 
 type Calico struct {
 	// +optional
-	Disabled `yaml:",inline" json:",inline"`
+	XDisabled `yaml:",inline" json:",inline"`
 	// +optional
 	IPIP calico.IPIPMode `yaml:"ipip" json:"ipip"`
 	// +optional
@@ -134,13 +134,13 @@ type Calico struct {
 
 type Antrea struct {
 	// +optional
-	Disabled `yaml:",inline" json:",inline"`
+	XDisabled `yaml:",inline" json:",inline"`
 	// +optional
 	IsCertReady bool `yaml:"isCertReady" json:"isCertReady"`
 }
 
 type Gatekeeper struct {
-	Disabled `yaml:",inline" json:",inline"`
+	XDisabled `yaml:",inline" json:",inline"`
 	// Templates is a path to directory containing gatekeeper templates
 	Templates string `yaml:"templates,omitempty" json:"templates,omitempty"`
 	// Templates is a path to directory containing gatekeeper constraints
@@ -231,7 +231,7 @@ func (db DB) GetConnectionURL(name string) string {
 }
 
 type PostgresOperator struct {
-	Disabled       `yaml:",inline" json:",inline"`
+	XDisabled      `yaml:",inline" json:",inline"`
 	DBVersion      string `yaml:"dbVersion,omitempty" json:"dbVersion,omitempty"`
 	BackupBucket   string `yaml:"backupBucket,omitempty" json:"backupBucket,omitempty"`
 	BackupSchedule string `yaml:"backupSchedule,omitempty" json:"backupSchedule,omitempty"`
@@ -240,11 +240,11 @@ type PostgresOperator struct {
 }
 
 type ArgocdOperator struct {
-	Disabled `yaml:",inline" json:",inline"`
+	XDisabled `yaml:",inline" json:",inline"`
 }
 
 type ArgoRollouts struct {
-	Disabled `yaml:",inline" json:",inline"`
+	XDisabled `yaml:",inline" json:",inline"`
 }
 
 type Keptn struct {
@@ -282,7 +282,7 @@ type S3Connection struct {
 }
 
 type Minio struct {
-	Disabled     `yaml:",inline" json:",inline"`
+	XDisabled    `yaml:",inline" json:",inline"`
 	Replicas     int         `yaml:"replicas,omitempty" json:"replicas,omitempty"`
 	AccessKey    string      `yaml:"access_key,omitempty" json:"access_key,omitempty"`
 	SecretKey    string      `yaml:"secret_key,omitempty" json:"secret_key,omitempty"`
@@ -402,7 +402,7 @@ func (c *Kubernetes) UnmarshalYAML(unmarshal func(interface{}) error) error {
 
 // Canary-checker allows for the deployment and configuration of the canary-checker
 type CanaryChecker struct {
-	Enabled `yaml:",inline" json:",inline"`
+	XEnabled `yaml:",inline" json:",inline"`
 	// +optional
 	Version string `yaml:"version" json:"version,"`
 	// +optional
@@ -410,16 +410,16 @@ type CanaryChecker struct {
 }
 
 type Dashboard struct {
-	Enabled `yaml:",inline" json:",inline"`
-	Version string `yaml:"version,omitempty" json:"version,omitempty"`
+	XEnabled `yaml:",inline" json:",inline"`
+	Version  string `yaml:"version,omitempty" json:"version,omitempty"`
 }
 
 type Dex struct {
-	Disabled `yaml:",inline" json:",inline"`
+	XDisabled `yaml:",inline" json:",inline"`
 }
 
 type Kpack struct {
-	Disabled `yaml:",inline" json:",inline"`
+	XDisabled `yaml:",inline" json:",inline"`
 }
 
 type DynamicDNS struct {
@@ -580,11 +580,11 @@ type Brand struct {
 }
 
 type Kiosk struct {
-	Disabled `yaml:",inline" json:",inline"`
+	XDisabled `yaml:",inline" json:",inline"`
 }
 
 type GitOperator struct {
-	Disabled `yaml:",inline" json:",inline"`
+	XDisabled `yaml:",inline" json:",inline"`
 }
 
 type ExternalDNS struct {
@@ -593,7 +593,7 @@ type ExternalDNS struct {
 }
 
 type TemplateOperator struct {
-	Disabled   `yaml:",inline" json:",inline"`
+	XDisabled  `yaml:",inline" json:",inline"`
 	SyncPeriod string `yaml:"syncPeriod,omitempty" json:"syncPeriod,omitempty"`
 }
 
@@ -603,7 +603,7 @@ type KarinaOperator struct {
 }
 
 type IstioOperator struct {
-	Disabled `yaml:",inline" json:",inline"`
+	XDisabled `yaml:",inline" json:",inline"`
 }
 
 type GitOps struct {
@@ -651,11 +651,11 @@ type GitOps struct {
 }
 
 type Velero struct {
-	Disabled `yaml:",inline" json:",inline"`
-	Schedule string            `yaml:"schedule,omitempty" json:"schedule,omitempty"`
-	Bucket   string            `yaml:"bucket,omitempty" json:"bucket,omitempty"`
-	Volumes  bool              `yaml:"volumes" json:"volumes,omitempty"`
-	Config   map[string]string `yaml:"config,omitempty" json:"config,omitempty"`
+	XDisabled `yaml:",inline" json:",inline"`
+	Schedule  string            `yaml:"schedule,omitempty" json:"schedule,omitempty"`
+	Bucket    string            `yaml:"bucket,omitempty" json:"bucket,omitempty"`
+	Volumes   bool              `yaml:"volumes" json:"volumes,omitempty"`
+	Config    map[string]string `yaml:"config,omitempty" json:"config,omitempty"`
 }
 
 type CA struct {
@@ -665,7 +665,7 @@ type CA struct {
 }
 
 type Thanos struct {
-	Disabled `yaml:",inline" json:",inline"`
+	XDisabled `yaml:",inline" json:",inline"`
 	// Retention of long-term storage, defaults to 180d
 	Retention string `yaml:"retention,omitempty" json:"retention,omitempty"`
 	// Must be either `client` or `observability`.
@@ -684,7 +684,7 @@ type ThanosE2E struct {
 }
 
 type Filebeat struct {
-	Disabled      `yaml:",inline" json:",inline"`
+	XDisabled     `yaml:",inline" json:",inline"`
 	Name          string      `yaml:"name" json:"name"`
 	Index         string      `yaml:"index" json:"index"`
 	Prefix        string      `yaml:"prefix" json:"prefix"`
@@ -693,36 +693,36 @@ type Filebeat struct {
 }
 
 type Journalbeat struct {
-	Disabled `yaml:",inline" json:",inline"`
-	Kibana   *Connection `yaml:"kibana,omitempty" json:"kibana,omitempty"`
+	XDisabled `yaml:",inline" json:",inline"`
+	Kibana    *Connection `yaml:"kibana,omitempty" json:"kibana,omitempty"`
 }
 
 type Auditbeat struct {
-	Disabled `yaml:",inline" json:",inline"`
-	Kibana   *Connection `yaml:"kibana,omitempty" json:"kibana,omitempty"`
+	XDisabled `yaml:",inline" json:",inline"`
+	Kibana    *Connection `yaml:"kibana,omitempty" json:"kibana,omitempty"`
 }
 
 type Packetbeat struct {
-	Disabled      `yaml:",inline" json:",inline"`
+	XDisabled     `yaml:",inline" json:",inline"`
 	Elasticsearch *Connection `yaml:"elasticsearch,omitempty" json:"elasticsearch,omitempty"`
 	Kibana        *Connection `yaml:"kibana,omitempty" json:"kibana,omitempty"`
 }
 
 type LogsExporter struct {
-	Disabled   `yaml:",inline" json:",inline"`
+	XDisabled  `yaml:",inline" json:",inline"`
 	SyncPeriod string `yaml:"syncPeriod" json:"syncPeriod"`
 }
 
 type EventRouter struct {
-	Disabled `yaml:",inline" json:",inline"`
+	XDisabled `yaml:",inline" json:",inline"`
 }
 
 type RedisOperator struct {
-	Disabled `yaml:",inline" json:",inline"`
+	XDisabled `yaml:",inline" json:",inline"`
 }
 
 type RabbitmqOperator struct {
-	Disabled `yaml:",inline" json:",inline"`
+	XDisabled `yaml:",inline" json:",inline"`
 }
 
 type Consul struct {
@@ -800,7 +800,7 @@ func wrap(with string, array ...string) []string {
 }
 
 type ECK struct {
-	Disabled `yaml:",inline" json:",inline"`
+	XDisabled `yaml:",inline" json:",inline"`
 }
 
 type NodeLocalDNS struct {
@@ -811,13 +811,13 @@ type NodeLocalDNS struct {
 }
 
 type SealedSecrets struct {
-	Enabled     `yaml:",inline" json:",inline"`
+	XEnabled    `yaml:",inline" json:",inline"`
 	Version     string `yaml:"version,omitempty" json:"version,omitempty"`
 	Certificate *CA    `yaml:"certificate,omitempty" json:"certificate,omitempty"`
 }
 
 type S3UploadCleaner struct {
-	Enabled  `yaml:",inline" json:",inline"`
+	XEnabled `yaml:",inline" json:",inline"`
 	Version  string `yaml:"version" json:"version"`
 	Endpoint string `yaml:"endpoint" json:"endpoint"`
 	Bucket   string `yaml:"bucket" json:"bucket"`
@@ -865,7 +865,7 @@ type RegistryCredentialsACR struct {
 }
 
 type PlatformOperator struct {
-	Disabled                   `yaml:",inline" json:",inline"`
+	XDisabled                  `yaml:",inline" json:",inline"`
 	EnableClusterResourceQuota bool              `yaml:"enableClusterResourceQuota" json:"enableClusterResourceQuota,omitempty"`
 	DefaultImagePullSecret     string            `yaml:"defaultImagePullSecret,omitempty" json:"defaultImagePullSecret,omitempty"`
 	RegistryWhitelist          []string          `yaml:"registryWhitelist,omitempty" json:"registryWhitelist,omitempty"`
@@ -946,7 +946,7 @@ type Elasticsearch struct {
 }
 
 type Tekton struct {
-	Disabled         `yaml:",inline" json:",inline"`
+	XDisabled        `yaml:",inline" json:",inline"`
 	DashboardVersion string            `yaml:"dashboardVersion,omitempty" json:"dashboardVersion,omitempty"`
 	EventsVersion    string            `yaml:"eventsVersion,omitempty" json:"eventsVersion,omitempty"`
 	Persistence      Persistence       `yaml:"persistence,omitempty" json:"persistence,omitempty"`
@@ -954,7 +954,7 @@ type Tekton struct {
 }
 
 type VPA struct {
-	Disabled `yaml:",inline" json:",inline"`
+	XDisabled `yaml:",inline" json:",inline"`
 }
 
 type Test struct {

@@ -18,6 +18,7 @@ import (
 	"github.com/flanksource/commons/files"
 	"github.com/flanksource/commons/is"
 	"github.com/flanksource/commons/logger"
+	"github.com/flanksource/commons/lookup"
 	"github.com/flanksource/commons/net"
 	"github.com/flanksource/karina/manifests"
 	"github.com/flanksource/karina/pkg/api"
@@ -31,6 +32,7 @@ import (
 	"github.com/flanksource/kommons/proxy"
 	konfigadm "github.com/flanksource/konfigadm/pkg/types"
 	pg "github.com/go-pg/pg/v9"
+	"github.com/imdario/mergo"
 	minio "github.com/minio/minio-go/v6"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -122,6 +124,14 @@ func (platform *Platform) Init() error {
 
 	if platform.Name == "" {
 		platform.Name = kommons.GetCurrentClusterNameFrom(platform.KubeConfigPath)
+	}
+
+	if platform.ImportSecrets != nil {
+		for _, secretRef := range platform.ImportSecrets {
+			if err := platform.ImportSecret(secretRef); err != nil {
+				return errors.Wrap(err, "failed to import secret")
+			}
+		}
 	}
 
 	return nil
@@ -932,4 +942,45 @@ func (platform *Platform) DefaultNamespaceAnnotations() map[string]string {
 
 func (platform *Platform) IsMaster(machine types.TagInterface) bool {
 	return machine.GetTags()["Role"] == platform.Name+"-masters"
+}
+
+func (platform *Platform) ImportSecret(secretRef v1.SecretReference) error {
+	clientset, err := platform.GetClientset()
+	if err != nil {
+		return errors.Wrap(err, "failed to get clientset")
+	}
+	secret, err := clientset.CoreV1().Secrets(secretRef.Namespace).Get(context.TODO(), secretRef.Name, metav1.GetOptions{})
+	if err != nil {
+		return errors.Wrapf(err, "failed to get secret %s/%s", secretRef.Namespace, secretRef.Name)
+	}
+
+	for k, v := range secret.Data {
+		if err := platform.importSecret(k, string(v)); err != nil {
+			return errors.Wrapf(err, "failed to import secret %s/%s with key %s", secretRef.Namespace, secretRef.Name, k)
+		}
+	}
+
+	return nil
+}
+
+func (platform *Platform) importSecret(key, val string) error {
+	if err := lookup.Set(&platform.PlatformConfig, key, val); err != nil {
+		platform.Debugf("failed to set key %s: %v", key, err)
+		return platform.importConfig(val)
+	}
+	return nil
+}
+
+func (platform *Platform) importConfig(configData string) error {
+	config := &types.PlatformConfig{}
+
+	if err := yaml.Unmarshal([]byte(configData), config); err != nil {
+		return errors.Wrap(err, "failed to unmarshal data into config")
+	}
+
+	if err := mergo.Merge(&platform.PlatformConfig, config, mergo.WithOverride); err != nil {
+		return errors.Wrapf(err, "failed to merge config")
+	}
+
+	return nil
 }
