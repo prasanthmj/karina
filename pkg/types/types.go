@@ -1065,7 +1065,7 @@ type ConfigDirective struct {
 }
 
 type LetsencryptIssuer struct {
-	Disabled `yaml:",inline" json:",inline"`
-	Email    string `yaml:"email,omitempty" json:"email,omitempty"`
-	URL      string `yaml:"url,omitempty" json:"url,omitempty"`
+	XDisabled `yaml:",inline" json:",inline"`
+	Email     string `yaml:"email,omitempty" json:"email,omitempty"`
+	URL       string `yaml:"url,omitempty" json:"url,omitempty"`
 }
