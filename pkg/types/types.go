@@ -248,7 +248,7 @@ type ArgoRollouts struct {
 }
 
 type Keptn struct {
-	Disabled `yaml:",inline" json:",inline"`
+	XDisabled `yaml:",inline" json:",inline"`
 }
 
 type SMTP struct {
@@ -588,8 +588,8 @@ type GitOperator struct {
 }
 
 type ExternalDNS struct {
-	Disabled `yaml:",inline" json:",inline"`
-	Args     map[string]string `yaml:"args" json:"args"`
+	XDisabled `yaml:",inline" json:",inline"`
+	Args      map[string]string `yaml:"args" json:"args"`
 }
 
 type TemplateOperator struct {
@@ -598,7 +598,7 @@ type TemplateOperator struct {
 }
 
 type KarinaOperator struct {
-	Disabled   `yaml:",inline" json:",inline"`
+	XDisabled  `yaml:",inline" json:",inline"`
 	SyncPeriod string `yaml:"syncPeriod,omitempty" json:"syncPeriod,omitempty"`
 }
 
