@@ -23,9 +23,9 @@ define BUILD_HELM_CHART
 		cd upstream/$*/helm && \
 		$(HELM) template $$($(YQ) r chart.yaml chart_name) --values values.yaml --output-dir ./generated_templates -n $$($(YQ) r chart.yaml namespace) --version $$($(YQ) r chart.yaml version) --repo=$$($(YQ) r chart.yaml repo) --include-crds && \
 		generated_yaml_files=$$(find generated_templates -iname '*.yaml') && \
-		echo $$generated_yaml_files | sed 's/ /\n/g' | xargs -n 1 -I % $(YQ) d -d '*' -i % '**."app.kubernetes.io/managed-by"' && \
-		echo $$generated_yaml_files | sed 's/ /\n/g' | xargs -n 1 -I % $(YQ) d -d '*' -i % '**."app.kubernetes.io/instance"' && \
-		echo $$generated_yaml_files | sed 's/ /\n/g' | xargs -n 1 -I % $(YQ) d -d '*' -i % '**."helm.sh/chart"'; \
+		printf "%s" "$$generated_yaml_files" | xargs -n 1 -I % $(YQ) d -d '*' -i % '**."app.kubernetes.io/managed-by"' && \
+		printf "%s" "$$generated_yaml_files" | xargs -n 1 -I % $(YQ) d -d '*' -i % '**."app.kubernetes.io/instance"' && \
+		printf "%s" "$$generated_yaml_files" | xargs -n 1 -I % $(YQ) d -d '*' -i % '**."helm.sh/chart"'; \
 	fi
 endef
 
@@ -69,7 +69,7 @@ template/%.yaml.raw: $$(wildcard upstream/$$*/template/*) $$(wildcard upstream/$
 	$(BUILD_HELM_CHART)
 	$(BUILD_TEMPLATE)
 
-.PHONY: build build-upstream-helm-charts build-crds build-base build-templates build-manifests
+.PHONY: clean clean-crds clean-manifests clean-templates build build-upstream-helm-charts build-crds build-base build-templates build-manifests
 
 OS   = $(shell uname -s | tr '[:upper:]' '[:lower:]')
 ARCH = $(shell uname -m | sed 's/x86_64/amd64/')
@@ -84,7 +84,7 @@ ARCH = $(shell uname -m | sed 's/x86_64/amd64/')
 
 .bin/helm:
 	@mkdir -p .bin
-	@curl -sSLo - https://get.helm.sh/helm-v3.5.2-$(OS)-$(ARCH).tar.gz | tar xzf - -C .bin/ --strip-components=1 '*/helm' && chmod +x .bin/helm
+	@curl -sSLo - https://get.helm.sh/helm-v3.5.2-$(OS)-$(ARCH).tar.gz | tar xzf - -C .bin/ --strip-components=1 $$(tar --version | grep -q 'gnu' && echo "--wildcards") '*/helm' && chmod +x .bin/helm
 
 KUSTOMIZE = $(realpath ./.bin/kustomize)
 YQ = $(realpath ./.bin/yq)
